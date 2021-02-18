@@ -51,7 +51,11 @@ class JIRARenderer(BaseRenderer):
 
     def render_inline_code(self, token):
         template = '{{{{{}}}}}'
-        return template.format(self.render_inner(token))
+        # return template.format(self.render_inner(escape_in_inline_code(token.content)))
+
+        # template = '<code>{}</code>'
+        inner = escape_in_inline_code(token.children[0].content)
+        return template.format(inner)
 
     def render_strikethrough(self, token):
         template = '-{}-'
@@ -79,7 +83,8 @@ class JIRARenderer(BaseRenderer):
 
     @staticmethod
     def render_raw_text(token):
-        return html.escape(token.content)
+        return token.content
+        # return html.escape(token.content)
 
     @staticmethod
     def render_html_span(token):
@@ -91,7 +96,7 @@ class JIRARenderer(BaseRenderer):
         return template.format(level=token.level, inner=inner)
 
     def render_quote(self, token):
-        template = 'bq. {inner}\n'
+        template = 'bq. {inner}'
         return template.format(inner=self.render_inner(token))
 
     def render_paragraph(self, token):
@@ -114,6 +119,8 @@ class JIRARenderer(BaseRenderer):
         return template.format(attr=attr, inner=inner)
 
     def render_list(self, token):
+        # template = '\n{inner}\n'
+        # return template.format(inner=self.render_inner(token))
         inner = self.render_inner(token)
         return inner
 
@@ -185,7 +192,7 @@ class JIRARenderer(BaseRenderer):
 
     @staticmethod
     def render_line_break(token):
-        return '\\\\\n'
+        return '\n'
 
     @staticmethod
     def render_html_block(token):
@@ -193,7 +200,8 @@ class JIRARenderer(BaseRenderer):
 
     def render_document(self, token):
         self.footnotes.update(token.footnotes)
-        return self.render_inner(token)
+        inner = '\n'.join([self.render(child) for child in token.children])
+        return '{}\n'.format(inner) if inner else ''
 
 def escape_url(raw):
     """
@@ -203,3 +211,5 @@ def escape_url(raw):
     return quote(raw, safe='/#:')
 
     
+def escape_in_inline_code(raw):
+    return raw.replace("{", "\{")
