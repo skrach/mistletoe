@@ -86,9 +86,9 @@ class MarkdownToJIRA:
             elif o in ('-o', '--output'):
                 self.options['output'] = i
 
-        if len(args) < 1:
-            sys.stderr.write(usageString + '\n')
-            sys.exit(1)
+        # if len(args) < 1:
+        #     sys.stderr.write(usageString + '\n')
+        #     sys.exit(1)
 
         with open(args[0], 'r') if len(args) == 1 else sys.stdin as infile:
             rendered = mistletoe.markdown(infile, JIRARenderer)
